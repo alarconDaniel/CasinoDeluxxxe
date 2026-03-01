@@ -1769,7 +1769,7 @@ MonoBehaviour:
   - symbolName: Cherry
     weight: 50
     payoutMultiplier: 2
-  - symbolName: Bar
+  - symbolName: Clover
     weight: 30
     payoutMultiplier: 3
   - symbolName: Seven
