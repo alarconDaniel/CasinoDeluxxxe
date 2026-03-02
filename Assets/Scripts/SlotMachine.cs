@@ -161,7 +161,7 @@ public class SlotMachine : CasinoMachineBase
             }
         }
 
-                // --- audio sources (2D) ---
+        // --- audio sources (2D) ---
         spinSource = gameObject.AddComponent<AudioSource>();
         spinSource.playOnAwake = false;
         spinSource.loop = false;
@@ -256,10 +256,20 @@ public class SlotMachine : CasinoMachineBase
 
         bool triple = (na == nb && nb == nc);
 
+        int payout = 0;
+        if (triple) payout = bet * a.payoutMultiplier;
+
+        // --- registra stats (slots) ---
+        var stats = CasinoStatsManager.Instance;
+        if (stats != null)
+        {
+            // guarda símbolos tal cual (o normalizados). Yo los mando normalizados pa que se vea bonito en CSV.
+            stats.RecordSlotsSpin(bet, na, nb, nc, triple, payout);
+        }
+
         if (triple)
         {
-            int win = bet * a.payoutMultiplier;
-            gm.AddCoins(win);
+            gm.AddCoins(payout);
             gm.AddXP(bet);
 
             SetLocalText("¡GANASTE!");
@@ -468,7 +478,7 @@ public class SlotMachine : CasinoMachineBase
         return Vector3.forward;
     }
 
-        void StartSpinSfx()
+    void StartSpinSfx()
     {
         if (spinClip == null || spinSource == null) return;
 

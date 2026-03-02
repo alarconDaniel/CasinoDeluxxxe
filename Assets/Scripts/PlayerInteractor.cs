@@ -5,8 +5,19 @@ public class PlayerInteractor : MonoBehaviour
     public float interactDistance = 3f;
     public HUDController hud;
 
+        [Header("Opcional: referencia al menú")]
+    public CasinoStatsMenu statsMenu;
+
     void Update()
     {
+
+        // Si el menú está abierto, no interactuamos con nada.
+        if (statsMenu != null && statsMenu.IsOpen)
+        {
+            hud.SetPrompt("");
+            return;
+        }
+
         IInteractable target = null;
 
         Ray ray = new Ray(transform.position, transform.forward);
