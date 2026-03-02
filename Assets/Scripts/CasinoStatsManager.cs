@@ -115,30 +115,32 @@ public class CasinoStatsManager : MonoBehaviour
 
         float rtp = (data.totalBetCoins > 0) ? (float)data.totalPayoutCoins / data.totalBetCoins : 0f;
 
+        char sep = ';';
+
         var sb = new StringBuilder();
-        sb.AppendLine("metric,value");
-        sb.AppendLine($"session_seconds,{data.sessionSeconds:0.00}");
-        sb.AppendLine($"slots_spins,{data.slotsSpins}");
-        sb.AppendLine($"roulette_spins,{data.rouletteSpins}");
-        sb.AppendLine($"wins,{data.totalWins}");
-        sb.AppendLine($"losses,{data.totalLosses}");
-        sb.AppendLine($"total_bets,{data.totalBetCoins}");
-        sb.AppendLine($"total_payouts,{data.totalPayoutCoins}");
-        sb.AppendLine($"net,{NetCoins}");
-        sb.AppendLine($"rtp,{rtp:0.000}");
+        sb.AppendLine($"metric{sep}value");
+        sb.AppendLine($"session_seconds{sep}{data.sessionSeconds:0.00}");
+        sb.AppendLine($"slots_spins{sep}{data.slotsSpins}");
+        sb.AppendLine($"roulette_spins{sep}{data.rouletteSpins}");
+        sb.AppendLine($"wins{sep}{data.totalWins}");
+        sb.AppendLine($"losses{sep}{data.totalLosses}");
+        sb.AppendLine($"total_bets{sep}{data.totalBetCoins}");
+        sb.AppendLine($"total_payouts{sep}{data.totalPayoutCoins}");
+        sb.AppendLine($"net{sep}{NetCoins}");
+        sb.AppendLine($"rtp{sep}{rtp:0.000}");
         sb.AppendLine();
-        sb.AppendLine("symbol,count");
+        sb.AppendLine($"symbol{sep}count");
         foreach (var sc in data.symbolCounts)
-            sb.AppendLine($"{Escape(sc.symbol)},{sc.count}");
+            sb.AppendLine($"{Escape(sc.symbol, sep)}{sep}{sc.count}");
 
         File.WriteAllText(path, sb.ToString(), Encoding.UTF8);
         Debug.Log("CSV exportado en: " + path);
         return path;
     }
 
-    private static string Escape(string s)
+    private static string Escape(string s, char sep)
     {
-        if (s.Contains(",") || s.Contains("\""))
+        if (s.Contains(sep) || s.Contains("\"") || s.Contains("\n"))
             return "\"" + s.Replace("\"", "\"\"") + "\"";
         return s;
     }

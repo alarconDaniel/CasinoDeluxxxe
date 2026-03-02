@@ -24,6 +24,7 @@ public class CasinoStatsMenu : MonoBehaviour
 
     public bool IsOpen => isOpen;
     bool isOpen;
+    public HUDController hud;
 
     void Awake()
     {
@@ -36,7 +37,7 @@ public class CasinoStatsMenu : MonoBehaviour
     {
         if (!isOpen) return;
 
-        if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.E))
+        if (Input.GetKeyDown(KeyCode.Escape))
             SetOpen(false);
 
         Refresh();
@@ -67,6 +68,9 @@ public class CasinoStatsMenu : MonoBehaviour
         Time.timeScale = open ? 0f : 1f;
 
         if (open) Refresh();
+
+        if (hud != null)
+            hud.SetHudVisible(!open);
     }
 
     IEnumerator Fade(bool open)
