@@ -33,6 +33,9 @@ public class CasinoStatsManager : MonoBehaviour
 
         // Conteo por símbolo (slots) y si quieres, por número en ruleta (roulette_17)
         public List<SymbolCount> symbolCounts = new List<SymbolCount>();
+
+
+        public int yahtzeeMatches;
     }
 
     [Header("Persistencia")]
@@ -180,5 +183,18 @@ public class CasinoStatsManager : MonoBehaviour
         }
     }
 
+public void RecordYahtzeeMatch(int bet, bool won, int payout)
+{
+    data.yahtzeeMatches++;
+    data.totalBetCoins += Mathf.Max(0, bet);
+    if (won) data.totalPayoutCoins += Mathf.Max(0, payout);
+
+    if (won) data.totalWins++;
+    else data.totalLosses++;
+}
+
     void OnApplicationQuit() => Save();
+
+
+
 }
