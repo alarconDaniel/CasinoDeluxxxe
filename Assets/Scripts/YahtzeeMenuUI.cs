@@ -26,6 +26,7 @@ public class YahtzeeMenuUI : MonoBehaviour
     [Header("Score rows")]
     public Transform rowsParent;
     public CategoryRowUI rowPrefab;
+    CategoryRowUI totalRow;
 
     public bool IsOpen => isOpen;
     bool isOpen;
@@ -64,6 +65,12 @@ public class YahtzeeMenuUI : MonoBehaviour
 
             rows[c] = row;
         }
+
+        // --- TOTAL ROW ---
+        totalRow = Instantiate(rowPrefab, rowsParent);
+        totalRow.SetName("TOTAL");
+        totalRow.SetScores(0, 0);
+totalRow.SetPickButtonGhost(false); // sin botón
     }
 
     public void SetRowState(YahtzeeCategory c, int? p, int? n, bool pickable)
@@ -151,5 +158,11 @@ public class YahtzeeMenuUI : MonoBehaviour
         root.alpha = to;
         root.interactable = open;
         root.blocksRaycasts = open;
+    }
+
+    public void SetTotals(int playerTotal, int npcTotal)
+    {
+        if (totalRow == null) return;
+        totalRow.SetScores(playerTotal, npcTotal);
     }
 }

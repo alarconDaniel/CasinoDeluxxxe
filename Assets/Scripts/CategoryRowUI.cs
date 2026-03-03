@@ -1,18 +1,38 @@
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class CategoryRowUI : MonoBehaviour
 {
-    public TMP_Text nameText;
-    public TMP_Text playerScoreText;
-    public TMP_Text npcScoreText;
+    public TMPro.TMP_Text nameText;
+    public TMPro.TMP_Text playerScoreText;
+    public TMPro.TMP_Text npcScoreText;
     public Button pickButton;
 
-    public void SetName(string n)
+    CanvasGroup pickCG;
+
+    void Awake()
     {
-        if (nameText != null) nameText.text = n;
+        if (pickButton != null)
+        {
+            pickCG = pickButton.GetComponent<CanvasGroup>();
+            if (pickCG == null) pickCG = pickButton.gameObject.AddComponent<CanvasGroup>();
+        }
     }
+
+    public void SetPickButtonGhost(bool visible)
+    {
+        if (pickButton == null) return;
+
+        // visible = true => normal
+        // visible = false => "fantasma": ocupa espacio pero no se ve ni clickea
+        if (pickCG == null) pickCG = pickButton.GetComponent<CanvasGroup>();
+
+        pickCG.alpha = visible ? 1f : 0f;
+        pickCG.interactable = visible;
+        pickCG.blocksRaycasts = visible;
+    }
+
+    public void SetName(string n) { if (nameText != null) nameText.text = n; }
 
     public void SetScores(int? player, int? npc)
     {

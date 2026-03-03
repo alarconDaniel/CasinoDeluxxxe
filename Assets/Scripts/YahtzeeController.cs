@@ -5,6 +5,7 @@ public class YahtzeeController : MonoBehaviour
 {
     [Header("Refs")]
     public YahtzeeMenuUI ui;
+    public HUDController hud;
 
     public Camera playerCam;
     public Transform camPoint;
@@ -75,6 +76,8 @@ public class YahtzeeController : MonoBehaviour
         ui.SetHoldsInteractable(false);
         ui.SetStatus("Entrando a Yahtzee...");
 
+        if (hud != null) hud.SetHudVisible(false);
+
         // Cursor + bloquear player
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
@@ -92,6 +95,8 @@ public class YahtzeeController : MonoBehaviour
 
         playerCard = new YahtzeeScoreCard();
         npcCard = new YahtzeeScoreCard();
+
+        ui.SetTotals(0, 0);
 
         // 13 rondas (categorías)
         for (int round = 1; round <= 13; round++)
@@ -217,6 +222,7 @@ public class YahtzeeController : MonoBehaviour
 
                 int score = YahtzeeScoring.Score(chosenCat.Value, lastPlayerDice);
                 playerCard.Set(chosenCat.Value, score);
+                ui.SetTotals(playerCard.Total(), npcCard.Total());
 
                 ui.SetStatus($"Guardaste {score} en {YahtzeeScoring.Pretty(chosenCat.Value)}.");
                 RefreshRowsPickable(playerCard, canPick: false); // se deshabilitan usadas, pero dejamos el estado correcto
@@ -261,6 +267,7 @@ public class YahtzeeController : MonoBehaviour
         int bestScore = YahtzeeScoring.Score(bestCat, lastNpcDice);
 
         npcCard.Set(bestCat, bestScore);
+        ui.SetTotals(playerCard.Total(), npcCard.Total());
 
         ui.SetStatus($"NPC eligió {YahtzeeScoring.Pretty(bestCat)} = {bestScore}");
         RefreshRowsPickable(playerCard, canPick: true); // player pickables se mantienen bien
@@ -355,6 +362,8 @@ public class YahtzeeController : MonoBehaviour
 
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
+
+        if (hud != null) hud.SetHudVisible(true);
 
         inMatch = false;
     }
