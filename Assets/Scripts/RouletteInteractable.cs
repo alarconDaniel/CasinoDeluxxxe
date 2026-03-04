@@ -1,59 +1,114 @@
 using System.Collections;
+using System.Text;
 using UnityEngine;
 
 public class RouletteInteractable : MonoBehaviour, IInteractable
 {
-    [Header("Texto HUD")]
+    [Header("UI / Texto")]
     [SerializeField] private string prompt = "Girar ruleta";
-    public string Prompt => prompt;
+    public int requiredLevel = 1;
+
+    [Header("Costo y premios")]
+    public int spinCostCoins = 25;
+    public int redCoins = 10;
+    public int blueCoins = 40;
+    public int orangeXP = 80;
+
+    public string Prompt => $"{prompt} (Req. Nivel {requiredLevel}) — {spinCostCoins} monedas";
 
     [Header("Qué gira")]
     public Transform wheelPivot;
 
+    [Header("Puntero y segmentos")]
+    public Transform pointer;        // Plano.002_3
+    public Transform segmentsRoot;   // Valores_Ruleta_4
+
+    [Header("Mensajes")]
+    public float resultMessageSeconds = 2f;
+    public bool showPrizeTableWhileSpinning = true;
+
+    [TextArea(2, 5)]
+    public string prizeTableText =
+        "PREMIOS\n" +
+        "AZUL: +40 monedas\n" +
+        "ROJO: +10 monedas\n" +
+        "NARANJA: +80 XP\n" +
+        "BLANCO: nada";
+
+    [Header("Raycast")]
+    public float rayStartOffset = 0.25f;
+    public float rayDistance = 3f;
+    public bool ensureRaycastColliders = true;
+
     [Header("Giro")]
-    public Vector3 localAxis = new Vector3(0, 1, 0); // (se mantiene, pero ahora es fallback)
+    public Vector3 localAxis = new Vector3(0, 1, 0);
     public float spinDuration = 3.0f;
-    public float startSpeed = 900f; // grados/seg al inicio
+    public float startSpeed = 900f;
 
-    // --- NUEVO: eje automático (solución fija) ---
-    [Header("Eje automático (recomendado)")]
-    public bool autoDetectAxis = true;      // déjalo en true
-    public bool invertDirection = false;    // si gira al revés, ponlo en true
+    [Header("Eje automático")]
+    public bool autoDetectAxis = true;
+    public bool invertDirection = false;
 
-    // --- NUEVO: centro automático (para que gire sobre su centro) ---
-    [Header("Centro automático (para girar sobre el centro)")]
-    public bool autoDetectCenter = true;    // déjalo en true
-    public bool recacheEachSpin = false;    // si cambias cosas en runtime, ponlo true
+    [Header("Centro automático")]
+    public bool autoDetectCenter = true;
+    public bool recacheEachSpin = false;
 
-    // --- NUEVO: audio ---
     [Header("Audio (sonido al girar)")]
-    public AudioSource spinAudioSource;     // arrastra aquí un AudioSource
-    public AudioClip spinClip;              // arrastra aquí tu sonido .wav/.mp3
+    public AudioSource spinAudioSource;
+    public AudioClip spinClip;
     [Range(0f, 1f)] public float spinVolume = 1f;
     public bool loopWhileSpinning = true;
     public bool fadeOutOnStop = true;
     public float fadeOutTime = 0.15f;
 
-    // --- NUEVO: luces (parpadeo durante el giro) ---
     [Header("Luces (parpadeo durante el giro)")]
-    public RouletteLightsBlink marqueeBlink; // arrastra aquí el componente de las luces
+    public RouletteLightsBlink marqueeBlink;
     public bool blinkWhileSpinning = true;
 
-    private bool spinning;
-    private bool axisResolved;
-    private Vector3 resolvedAxisLocal = Vector3.forward;
+    HUDController hud;
 
-    // cache de centro/eje en mundo
-    private bool centerResolved;
-    private Vector3 spinCenterWorld;
-    private Vector3 spinAxisWorld;
+    bool spinning;
+    bool axisResolved;
+    Vector3 resolvedAxisLocal = Vector3.forward;
+
+    bool centerResolved;
+    Vector3 spinCenterWorld;
+    Vector3 spinAxisWorld;
+
+    enum Kind { White, Red, Blue, Orange, Unknown }
+
+    void Awake()
+    {
+        hud = FindObjectOfType<HUDController>();
+
+        if (segmentsRoot == null) segmentsRoot = wheelPivot;
+
+        if (ensureRaycastColliders && segmentsRoot != null)
+            EnsureRaycastMeshColliders(segmentsRoot);
+    }
 
     public void Interact()
     {
         if (spinning) return;
-        if (wheelPivot == null)
+
+        var gm = CasinoGameManager.Instance;
+        if (gm == null) return;
+
+        if (gm.level < requiredLevel)
         {
-            Debug.LogError("RouletteInteractable: wheelPivot no asignado.");
+            hud?.ShowResultTimed($"Necesitas nivel {requiredLevel}", 2f);
+            return;
+        }
+
+        if (wheelPivot == null || pointer == null || segmentsRoot == null)
+        {
+            hud?.ShowResultTimed("Falta configurar la ruleta", 2f);
+            return;
+        }
+
+        if (!gm.TrySpendCoins(spinCostCoins))
+        {
+            hud?.ShowResultTimed($"No tienes {spinCostCoins} monedas", 2f);
             return;
         }
 
@@ -69,17 +124,21 @@ public class RouletteInteractable : MonoBehaviour, IInteractable
             centerResolved = true;
         }
 
-        // ✅ LUCES: iniciar parpadeo cuando empieza a girar
+        // Mostrar tabla arriba-derecha
+        if (showPrizeTableWhileSpinning && hud != null)
+        {
+            hud.ShowPrizeTable(SanitizeText(prizeTableText));
+        }
+
         if (blinkWhileSpinning && marqueeBlink != null)
             marqueeBlink.SetBlinking(true);
 
-        // ✅ AUDIO: iniciar sonido cuando empieza a girar
         StartSpinAudio();
 
         StartCoroutine(SpinRoutine());
     }
 
-    private IEnumerator SpinRoutine()
+    IEnumerator SpinRoutine()
     {
         spinning = true;
 
@@ -89,35 +148,138 @@ public class RouletteInteractable : MonoBehaviour, IInteractable
             t += Time.deltaTime;
             float n = Mathf.Clamp01(t / spinDuration);
 
-            // Frenado suave (ease out)
             float speed = Mathf.Lerp(startSpeed, 0f, n * n);
             float delta = speed * Time.deltaTime;
-
             if (invertDirection) delta = -delta;
 
-            // ✅ CLAVE: girar alrededor del centro real, con el eje correcto
             wheelPivot.RotateAround(spinCenterWorld, spinAxisWorld, delta);
-
             yield return null;
         }
 
         spinning = false;
 
-        // ✅ AUDIO: detener sonido al terminar
         StopSpinAudio();
 
-        // ✅ LUCES: detener parpadeo al terminar
         if (blinkWhileSpinning && marqueeBlink != null)
             marqueeBlink.SetBlinking(false);
+
+        // Ocultar tabla
+        hud?.HidePrizeTable();
+
+        ResolveAndPay();
     }
 
-    private void CacheCenterAndAxisWorld()
+    void ResolveAndPay()
     {
-        // eje local -> eje world
+        var gm = CasinoGameManager.Instance;
+        if (gm == null) return;
+
+        Kind k = DetectKindUnderPointer(out string hitName);
+
+        int coinsWin = 0;
+        int xpWin = 0;
+
+        if (k == Kind.Red) coinsWin = redCoins;
+        else if (k == Kind.Blue) coinsWin = blueCoins;
+        else if (k == Kind.Orange) xpWin = orangeXP;
+
+        if (coinsWin > 0) gm.AddCoins(coinsWin);
+        if (xpWin > 0) gm.AddXP(xpWin);
+
+        string msg = BuildFriendlyResultMessage(k, coinsWin, xpWin, hitName);
+        hud?.ShowResultTimed(SanitizeText(msg), resultMessageSeconds);
+    }
+
+    string BuildFriendlyResultMessage(Kind k, int coinsWin, int xpWin, string hitName)
+    {
+        switch (k)
+        {
+            case Kind.Blue:   return $"¡AZUL! HAS GANADO +{coinsWin} MONEDAS";
+            case Kind.Red:    return $"¡ROJO! HAS GANADO +{coinsWin} MONEDAS";
+            case Kind.Orange: return $"¡NARANJA! HAS GANADO +{xpWin} XP";
+            case Kind.White:  return "SIGUE INTENTANDO";
+            default:          return $"RESULTADO DESCONOCIDO ({hitName})";
+        }
+    }
+
+    // Quita emojis y símbolos raros automáticamente (evita los recuadros)
+    static string SanitizeText(string s)
+    {
+        if (string.IsNullOrEmpty(s)) return "";
+        var sb = new StringBuilder(s.Length);
+        foreach (char ch in s)
+        {
+            // permite ASCII + Latin-1 (acentos), saltos de línea
+            if (ch == '\n' || ch == '\r' || ch == '\t' || ch <= 0x00FF)
+                sb.Append(ch);
+        }
+        return sb.ToString();
+    }
+
+    // ---------- Detección por raycast + nombre ----------
+    Kind DetectKindUnderPointer(out string hitName)
+    {
+        hitName = "";
+
+        Vector3 axis = spinAxisWorld.sqrMagnitude > 0.0001f ? spinAxisWorld.normalized : wheelPivot.forward;
+        Vector3 origin = pointer.position + axis * rayStartOffset;
+
+        RaycastHit[] hits = Physics.RaycastAll(origin, -axis, rayDistance, ~0, QueryTriggerInteraction.Ignore);
+        if (hits == null || hits.Length == 0)
+            hits = Physics.RaycastAll(origin, axis, rayDistance, ~0, QueryTriggerInteraction.Ignore);
+
+        float best = float.MaxValue;
+        Transform bestT = null;
+
+        foreach (var h in hits)
+        {
+            if (h.collider == null) continue;
+            Transform t = h.collider.transform;
+            if (!IsChildOf(t, segmentsRoot)) continue;
+
+            if (h.distance < best)
+            {
+                best = h.distance;
+                bestT = t;
+            }
+        }
+
+        if (bestT == null) return Kind.Unknown;
+
+        // Sube hasta el hijo directo tipo Color_03_blue
+        Transform p = bestT;
+        while (p != null && p.parent != null && p.parent != segmentsRoot)
+            p = p.parent;
+
+        hitName = p != null ? p.name : bestT.name;
+
+        string n = hitName.ToLowerInvariant();
+        if (n.Contains("white")) return Kind.White;
+        if (n.Contains("red")) return Kind.Red;
+        if (n.Contains("blue")) return Kind.Blue;
+        if (n.Contains("orange")) return Kind.Orange;
+
+        return Kind.Unknown;
+    }
+
+    static bool IsChildOf(Transform t, Transform root)
+    {
+        if (t == null || root == null) return false;
+        Transform p = t;
+        while (p != null)
+        {
+            if (p == root) return true;
+            p = p.parent;
+        }
+        return false;
+    }
+
+    // ---------- Centro/Eje ----------
+    void CacheCenterAndAxisWorld()
+    {
         Vector3 axisLocal = (resolvedAxisLocal.sqrMagnitude < 0.0001f) ? Vector3.up : resolvedAxisLocal.normalized;
         spinAxisWorld = wheelPivot.TransformDirection(axisLocal).normalized;
 
-        // centro world
         spinCenterWorld = wheelPivot.position;
 
         if (!autoDetectCenter) return;
@@ -132,22 +294,14 @@ public class RouletteInteractable : MonoBehaviour, IInteractable
         spinCenterWorld = b.center;
     }
 
-    // Calcula el eje "normal" del objeto: el de menor grosor en espacio local del wheelPivot.
-    // Esto evita el problema de "moneda".
-    private Vector3 ResolveAxisLocal()
+    Vector3 ResolveAxisLocal()
     {
-        // Si no quieres auto, usa el localAxis como antes
         if (!autoDetectAxis)
-        {
             return (localAxis.sqrMagnitude < 0.0001f) ? Vector3.up : localAxis.normalized;
-        }
 
         var renderers = wheelPivot.GetComponentsInChildren<Renderer>();
         if (renderers == null || renderers.Length == 0)
-        {
-            // Fallback
             return (localAxis.sqrMagnitude < 0.0001f) ? Vector3.up : localAxis.normalized;
-        }
 
         bool hasAnyPoint = false;
         Bounds localBounds = new Bounds(Vector3.zero, Vector3.zero);
@@ -178,23 +332,35 @@ public class RouletteInteractable : MonoBehaviour, IInteractable
                     localBounds = new Bounds(pLocal, Vector3.zero);
                     hasAnyPoint = true;
                 }
-                else
-                {
-                    localBounds.Encapsulate(pLocal);
-                }
+                else localBounds.Encapsulate(pLocal);
             }
         }
 
         Vector3 size = localBounds.size;
-
-        if (size.x <= size.y && size.x <= size.z) return Vector3.right;   // X
-        if (size.y <= size.x && size.y <= size.z) return Vector3.up;      // Y
-        return Vector3.forward;                                           // Z
+        if (size.x <= size.y && size.x <= size.z) return Vector3.right;
+        if (size.y <= size.x && size.y <= size.z) return Vector3.up;
+        return Vector3.forward;
     }
 
-    // ----------------- AUDIO HELPERS -----------------
+    // ---------- Colliders para raycast ----------
+    void EnsureRaycastMeshColliders(Transform root)
+    {
+        var mfs = root.GetComponentsInChildren<MeshFilter>(true);
+        foreach (var mf in mfs)
+        {
+            if (mf == null || mf.sharedMesh == null) continue;
 
-    private void StartSpinAudio()
+            var mc = mf.GetComponent<MeshCollider>();
+            if (mc == null) mc = mf.gameObject.AddComponent<MeshCollider>();
+
+            mc.sharedMesh = mf.sharedMesh;
+            mc.convex = false;
+            mc.isTrigger = false;
+        }
+    }
+
+    // ---------- Audio helpers ----------
+    void StartSpinAudio()
     {
         if (spinAudioSource == null || spinClip == null) return;
 
@@ -206,7 +372,7 @@ public class RouletteInteractable : MonoBehaviour, IInteractable
             spinAudioSource.Play();
     }
 
-    private void StopSpinAudio()
+    void StopSpinAudio()
     {
         if (spinAudioSource == null) return;
         if (!spinAudioSource.isPlaying) return;
@@ -217,7 +383,7 @@ public class RouletteInteractable : MonoBehaviour, IInteractable
             spinAudioSource.Stop();
     }
 
-    private IEnumerator FadeOutAndStop(AudioSource src, float time)
+    IEnumerator FadeOutAndStop(AudioSource src, float time)
     {
         float startVol = src.volume;
         float t = 0f;
@@ -230,6 +396,6 @@ public class RouletteInteractable : MonoBehaviour, IInteractable
         }
 
         src.Stop();
-        src.volume = startVol; // deja listo para la próxima
+        src.volume = startVol;
     }
 }

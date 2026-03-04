@@ -409,6 +409,13 @@ MonoBehaviour:
   promptText: {fileID: 1608332366}
   messageText: {fileID: 1381764023}
   group: {fileID: 59423251}
+  promptFontSizeMultiplier: 1
+  prizeFontSize: 22
+  resultFontSize: 42
+  prizeOffset: {x: -20, y: -20}
+  resultOffset: {x: 0, y: -20}
+  prizeSize: {x: 520, y: 220}
+  resultSize: {x: 1000, y: 120}
 --- !u!225 &59423251
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -3489,6 +3496,13 @@ MonoBehaviour:
   promptText: {fileID: 1608332366}
   messageText: {fileID: 1381764023}
   group: {fileID: 0}
+  promptFontSizeMultiplier: 1
+  prizeFontSize: 22
+  resultFontSize: 42
+  prizeOffset: {x: -20, y: -20}
+  resultOffset: {x: 0, y: -20}
+  prizeSize: {x: 520, y: 220}
+  resultSize: {x: 1000, y: 120}
 --- !u!114 &1422530178
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6145,7 +6159,7 @@ GameObject:
   - component: {fileID: 8925283426583598419}
   - component: {fileID: 1962590294470109263}
   m_Layer: 0
-  m_Name: Object_20
+  m_Name: Color_03_blue
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6396,7 +6410,7 @@ GameObject:
   - component: {fileID: 6949187942210510902}
   - component: {fileID: 8329217061278107139}
   m_Layer: 0
-  m_Name: Object_18
+  m_Name: Color_01_white
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6515,9 +6529,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RouletteInteractable
   prompt: Girar ruleta
+  requiredLevel: 1
+  spinCostCoins: 25
+  redCoins: 10
+  blueCoins: 40
+  orangeXP: 80
   wheelPivot: {fileID: 879075351}
+  pointer: {fileID: 3858646118544205316}
+  segmentsRoot: {fileID: 5703043249148768648}
+  resultMessageSeconds: 2
+  showPrizeTableWhileSpinning: 1
+  prizeTableText: "Premios:\n\U0001F535 Azul = +40 monedas\n\U0001F534 Rojo = +10
+    monedas\n\U0001F7E0 Naranja = +80 XP\n\u26AA Blanco = nada"
+  rayStartOffset: 0.25
+  rayDistance: 3
+  ensureRaycastColliders: 1
   localAxis: {x: 0, y: 0, z: 1}
-  spinDuration: 9.8
+  spinDuration: 9.9
   startSpeed: 840
   autoDetectAxis: 1
   invertDirection: 0
@@ -7059,7 +7087,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5774659077349710741}
-  - component: {fileID: 6666855341319721860}
   - component: {fileID: 6666855341319721861}
   m_Layer: 0
   m_Name: Luces_espheres_1
@@ -7068,32 +7095,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &6666855341319721860
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6666855341319721859}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 452f26d5ad35f1a4fa6d52c0415168bc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RouletteMarqueeLights
-  lightsRoot: {fileID: 2622575139000817356}
-  center: {fileID: 879075351}
-  localAxis: {x: 0, y: 1, z: 0}
-  stepTime: 0.03
-  litCount: 3
-  clockwise: 1
-  onEmission:
-    r: 32
-    g: 32
-    b: 32
-    a: 1
-  offBaseDim: 0.15
-  _timer: 0
-  _index: 0
 --- !u!114 &6666855341319721861
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7654,7 +7655,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6569145876191267213}
-  - component: {fileID: 8978103524669911646}
   m_Layer: 0
   m_Name: GLTF_SceneRootNode
   m_TagString: Untagged
@@ -7662,23 +7662,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &8978103524669911646
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8978103524669911645}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 18c4ed539cbbc724d8c658b05902188a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RouletteSpinner
-  wheelPivot: {fileID: 879075351}
-  localAxis: {x: 0, y: 0, z: 1}
-  spinDuration: 3
-  startSpeed: 900
-  spinning: 0
 --- !u!1 &8993873548812234111
 GameObject:
   m_ObjectHideFlags: 0
@@ -7691,7 +7674,7 @@ GameObject:
   - component: {fileID: 232833486668732675}
   - component: {fileID: 5429962030544362592}
   m_Layer: 0
-  m_Name: Object_21
+  m_Name: Color_04_orange
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7709,7 +7692,7 @@ GameObject:
   - component: {fileID: 2966079306286339479}
   - component: {fileID: 8094912910761259281}
   m_Layer: 0
-  m_Name: Object_19
+  m_Name: Color_02_red
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

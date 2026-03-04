@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 public class CasinoGameManager : MonoBehaviour
@@ -6,20 +7,21 @@ public class CasinoGameManager : MonoBehaviour
     public static CasinoGameManager Instance { get; private set; }
 
     [Header("Estado (variables)")]
-    public int coins = 100;        // C (bienvenida) :contentReference[oaicite:6]{index=6}
-    public int level = 1;          // L
-    public int xp = 0;             // XP
-    public int bet = 10;           // B
-    public float sessionSeconds;   // T (en segundos, mostramos en minutos)
+    public int coins = 100;
+    public int level = 1;
+    public int xp = 0;
+    public int bet = 10;
+    public float sessionSeconds;
 
     [Header("Progresión determinística (XP acumulada)")]
-    // L1: 0, L2: 100, L3: 250, L4: 450, L5: 700 (del ejemplo) :contentReference[oaicite:7]{index=7}
     public int[] levelThresholds = { 0, 100, 250, 450, 700 };
-    public int[] levelRewardsCoins = { 100, 150, 200, 250, 300 }; // ejemplo del doc :contentReference[oaicite:8]{index=8}
+    public int[] levelRewardsCoins = { 100, 150, 200, 250, 300 };
 
     public string lastMessage = "";
 
     public event Action OnStateChanged;
+
+    Coroutine clearMsgRoutine;
 
     void Awake()
     {
@@ -31,7 +33,6 @@ public class CasinoGameManager : MonoBehaviour
     {
         sessionSeconds += Time.deltaTime;
 
-        // Ajuste de apuesta rápido (B)
         if (Input.GetKeyDown(KeyCode.Minus) || Input.GetKeyDown(KeyCode.KeypadMinus)) SetBet(bet - 5);
         if (Input.GetKeyDown(KeyCode.Equals) || Input.GetKeyDown(KeyCode.KeypadPlus)) SetBet(bet + 5);
     }
@@ -65,13 +66,12 @@ public class CasinoGameManager : MonoBehaviour
 
     private void CheckLevelUp()
     {
-        // Determinístico: si supera umbral, sube y aplica recompensa fija :contentReference[oaicite:9]{index=9}
         while (level < levelThresholds.Length && xp >= levelThresholds[level])
         {
             level++;
             int rewardIndex = Mathf.Clamp(level - 1, 0, levelRewardsCoins.Length - 1);
             AddCoins(levelRewardsCoins[rewardIndex]);
-            SetMessage($"¡Subiste a nivel {level}! Recompensa: +{levelRewardsCoins[rewardIndex]} monedas.");
+            SetMessage($"¡Nivel {level}! +{levelRewardsCoins[rewardIndex]} monedas");
         }
     }
 
@@ -79,6 +79,27 @@ public class CasinoGameManager : MonoBehaviour
     {
         lastMessage = msg;
         Notify();
+    }
+
+    // ✅ NUEVO: mensaje por X segundos y luego se limpia
+    public void SetMessageTimed(string msg, float seconds)
+    {
+        lastMessage = msg;
+        Notify();
+
+        if (clearMsgRoutine != null) StopCoroutine(clearMsgRoutine);
+        clearMsgRoutine = StartCoroutine(ClearMessageAfter(seconds, msg));
+    }
+
+    IEnumerator ClearMessageAfter(float seconds, string sameMsg)
+    {
+        yield return new WaitForSeconds(seconds);
+        if (lastMessage == sameMsg)
+        {
+            lastMessage = "";
+            Notify();
+        }
+        clearMsgRoutine = null;
     }
 
     private void Notify() => OnStateChanged?.Invoke();
