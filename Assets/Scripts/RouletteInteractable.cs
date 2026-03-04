@@ -27,13 +27,13 @@ public class RouletteInteractable : MonoBehaviour, IInteractable
     public float resultMessageSeconds = 2f;
     public bool showPrizeTableWhileSpinning = true;
 
-    [TextArea(2, 5)]
+    [TextArea(5, 5)]
     public string prizeTableText =
-        "PREMIOS\n" +
-        "AZUL: +40 monedas\n" +
-        "ROJO: +10 monedas\n" +
+        "PREMIOS DE LA RULETA\n" +
+        "AZUL:    +40 monedas\n" +
+        "ROJO:    +10 monedas\n" +
         "NARANJA: +80 XP\n" +
-        "BLANCO: nada";
+        "BLANCO:  nada";
 
     [Header("Raycast")]
     public float rayStartOffset = 0.25f;
@@ -102,7 +102,7 @@ public class RouletteInteractable : MonoBehaviour, IInteractable
 
         if (wheelPivot == null || pointer == null || segmentsRoot == null)
         {
-            hud?.ShowResultTimed("Falta configurar la ruleta", 2f);
+            hud?.ShowResultTimed("ERROR en la configuracion de la ruleta", 2f);
             return;
         }
 
@@ -198,7 +198,7 @@ public class RouletteInteractable : MonoBehaviour, IInteractable
             case Kind.Red:    return $"¡ROJO! HAS GANADO +{coinsWin} MONEDAS";
             case Kind.Orange: return $"¡NARANJA! HAS GANADO +{xpWin} XP";
             case Kind.White:  return "SIGUE INTENTANDO";
-            default:          return $"RESULTADO DESCONOCIDO ({hitName})";
+            default:          return "SIGUE INTENTANDO";
         }
     }
 

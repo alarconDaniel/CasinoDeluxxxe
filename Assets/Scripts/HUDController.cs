@@ -14,8 +14,8 @@ public class HUDController : MonoBehaviour
     public float promptFontSizeMultiplier = 1f; // 1 = igual a hudText
 
     [Header("Overlays (auto-creados)")]
-    public float prizeFontSize = 22f;
-    public float resultFontSize = 36f;
+    public float prizeFontSize = 32f;
+    public float resultFontSize = 32f;
 
     // offsets desde el borde (píxeles)
     public Vector2 prizeOffset = new Vector2(-20f, -20f);   // arriba-derecha

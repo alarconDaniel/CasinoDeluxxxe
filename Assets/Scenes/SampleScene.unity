@@ -6539,8 +6539,17 @@ MonoBehaviour:
   segmentsRoot: {fileID: 5703043249148768648}
   resultMessageSeconds: 2
   showPrizeTableWhileSpinning: 1
-  prizeTableText: "Premios:\n\U0001F535 Azul = +40 monedas\n\U0001F534 Rojo = +10
-    monedas\n\U0001F7E0 Naranja = +80 XP\n\u26AA Blanco = nada"
+  prizeTableText: '     PREMIOS DE LA RULETA
+
+    Azu     --->    +40 monedas
+
+    Rojo    
+    --->   +10 monedas
+
+    Naranja     --->        +80 XP
+
+    Blanco     --->            
+    nada'
   rayStartOffset: 0.25
   rayDistance: 3
   ensureRaycastColliders: 1
