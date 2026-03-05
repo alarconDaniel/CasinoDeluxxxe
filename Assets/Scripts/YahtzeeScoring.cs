@@ -54,23 +54,45 @@ public static class YahtzeeScoring
 
         switch (cat)
         {
-            case YahtzeeCategory.Ones:   return counts[1] * 1;
-            case YahtzeeCategory.Twos:   return counts[2] * 2;
+            case YahtzeeCategory.Ones: return counts[1] * 1;
+            case YahtzeeCategory.Twos: return counts[2] * 2;
             case YahtzeeCategory.Threes: return counts[3] * 3;
-            case YahtzeeCategory.Fours:  return counts[4] * 4;
-            case YahtzeeCategory.Fives:  return counts[5] * 5;
-            case YahtzeeCategory.Sixes:  return counts[6] * 6;
+            case YahtzeeCategory.Fours: return counts[4] * 4;
+            case YahtzeeCategory.Fives: return counts[5] * 5;
+            case YahtzeeCategory.Sixes: return counts[6] * 6;
 
             case YahtzeeCategory.ThreeOfKind: return has3 ? sum : 0;
-            case YahtzeeCategory.FourOfKind:  return has4 ? sum : 0;
-            case YahtzeeCategory.FullHouse:   return fullHouse ? 25 : 0;
+            case YahtzeeCategory.FourOfKind: return has4 ? sum : 0;
+            case YahtzeeCategory.FullHouse: return fullHouse ? 25 : 0;
             case YahtzeeCategory.SmallStraight: return smallStraight ? 30 : 0;
             case YahtzeeCategory.LargeStraight: return largeStraight ? 40 : 0;
             case YahtzeeCategory.Yahtzee: return has5 ? 50 : 0;
-            case YahtzeeCategory.Chance:  return sum;
+            case YahtzeeCategory.Chance: return sum;
         }
 
         return 0;
+    }
+
+    public static int MaxPossible(YahtzeeCategory cat)
+    {
+        return cat switch
+        {
+            YahtzeeCategory.Ones => 5,
+            YahtzeeCategory.Twos => 10,
+            YahtzeeCategory.Threes => 15,
+            YahtzeeCategory.Fours => 20,
+            YahtzeeCategory.Fives => 25,
+            YahtzeeCategory.Sixes => 30,
+
+            YahtzeeCategory.ThreeOfKind => 30,
+            YahtzeeCategory.FourOfKind => 30,
+            YahtzeeCategory.FullHouse => 25,
+            YahtzeeCategory.SmallStraight => 30,
+            YahtzeeCategory.LargeStraight => 40,
+            YahtzeeCategory.Yahtzee => 50,
+            YahtzeeCategory.Chance => 30,
+            _ => 0
+        };
     }
 
     static bool HasStraight(int[] diceSorted, int len)

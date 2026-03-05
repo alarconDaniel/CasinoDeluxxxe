@@ -29,6 +29,7 @@ public class YahtzeeMenuUI : MonoBehaviour
     CategoryRowUI totalRow;
 
     public bool IsOpen => isOpen;
+    bool suppressHoldSfx;
     bool isOpen;
 
     public event Action OnRollPressed;
@@ -41,6 +42,18 @@ public class YahtzeeMenuUI : MonoBehaviour
     {
         if (rollButton != null) rollButton.onClick.AddListener(() => OnRollPressed?.Invoke());
         if (exitButton != null) exitButton.onClick.AddListener(() => OnExitPressed?.Invoke());
+
+        for (int i = 0; i < holdToggles.Length; i++)
+        {
+            if (holdToggles[i] == null) continue;
+
+            holdToggles[i].onValueChanged.AddListener(_ =>
+            {
+                if (suppressHoldSfx) return;
+                var audio = CasinoAudioSfx.Instance;
+                if (audio != null) audio.PlayHoldToggle();
+            });
+        }
 
         SetOpen(false, true);
     }
@@ -60,7 +73,12 @@ public class YahtzeeMenuUI : MonoBehaviour
             if (row.pickButton != null)
             {
                 var captured = c;
-                row.pickButton.onClick.AddListener(() => OnCategoryPressed?.Invoke(captured));
+                row.pickButton.onClick.AddListener(() =>
+                {
+                    var audio = CasinoAudioSfx.Instance;
+                    if (audio != null) audio.PlayPickCategory();
+                    OnCategoryPressed?.Invoke(captured);
+                });
             }
 
             rows[c] = row;
@@ -70,7 +88,7 @@ public class YahtzeeMenuUI : MonoBehaviour
         totalRow = Instantiate(rowPrefab, rowsParent);
         totalRow.SetName("TOTAL");
         totalRow.SetScores(0, 0);
-totalRow.SetPickButtonGhost(false); // sin botón
+        totalRow.SetPickButtonGhost(false); // sin botón
     }
 
     public void SetRowState(YahtzeeCategory c, int? p, int? n, bool pickable)
@@ -99,8 +117,10 @@ totalRow.SetPickButtonGhost(false); // sin botón
 
     public void ResetHolds()
     {
+        suppressHoldSfx = true;
         for (int i = 0; i < holdToggles.Length; i++)
             if (holdToggles[i] != null) holdToggles[i].isOn = false;
+        suppressHoldSfx = false;
     }
 
     public void SetDiceTexts(int[] playerDice, int[] npcDice)

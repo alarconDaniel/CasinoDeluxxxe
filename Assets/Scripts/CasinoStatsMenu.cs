@@ -104,7 +104,7 @@ public class CasinoStatsMenu : MonoBehaviour
         float rtp = (d.totalBetCoins > 0) ? (float)d.totalPayoutCoins / d.totalBetCoins : 0f;
 
         if (sessionText != null) sessionText.text = $"Tiempo de juego: {minutes:0.0} min";
-        if (playsText != null) playsText.text = $"Tiros • Slots: {d.slotsSpins}  |  Ruleta: {d.rouletteSpins}";
+        if (playsText != null) playsText.text = $"Tiros • Slots: {d.slotsSpins}  |  Ruleta: {d.rouletteSpins}  |  Yahtzee: {d.yahtzeeMatches}";
         if (winLossText != null) winLossText.text = $"Resultados • Ganadas: {d.totalWins}  |  Perdidas: {d.totalLosses}";
         if (moneyText != null) moneyText.text = $"Monedas • Apostado: {d.totalBetCoins}  |  Pagado: {d.totalPayoutCoins}  |  Neto: {stats.NetCoins}  |  RTP: {rtp:0.000}";
 

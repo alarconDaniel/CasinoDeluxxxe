@@ -125,6 +125,7 @@ public class CasinoStatsManager : MonoBehaviour
         sb.AppendLine($"session_seconds{sep}{data.sessionSeconds:0.00}");
         sb.AppendLine($"slots_spins{sep}{data.slotsSpins}");
         sb.AppendLine($"roulette_spins{sep}{data.rouletteSpins}");
+        sb.AppendLine($"yahtzee_matches{sep}{data.yahtzeeMatches}");
         sb.AppendLine($"wins{sep}{data.totalWins}");
         sb.AppendLine($"losses{sep}{data.totalLosses}");
         sb.AppendLine($"total_bets{sep}{data.totalBetCoins}");

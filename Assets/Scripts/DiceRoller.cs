@@ -18,6 +18,11 @@ public class DiceRoller : MonoBehaviour
     public float angThreshold = 0.08f;
     public float stableTimeNeeded = 0.35f;
 
+
+    [Header("VFX (optional)")]
+    public ParticleSystem rollVfx;
+    public Vector3 rollVfxOffset = new Vector3(0f, 0.05f, 0f);
+
     public IEnumerator Roll(bool[] holdMask, Action<int[]> onDone)
     {
         if (throwArea == null || dice == null || dice.Length == 0)
@@ -29,6 +34,20 @@ public class DiceRoller : MonoBehaviour
 
         if (holdMask == null || holdMask.Length != dice.Length)
             holdMask = new bool[dice.Length];
+
+        // --- VFX: solo si realmente se van a lanzar dados ---
+        bool anyThrow = false;
+        for (int i = 0; i < holdMask.Length; i++)
+        {
+            if (!holdMask[i]) { anyThrow = true; break; }
+        }
+
+        if (anyThrow && rollVfx != null)
+        {
+            Vector3 p = (throwArea != null) ? throwArea.bounds.center : transform.position;
+            rollVfx.transform.position = p + rollVfxOffset;
+            rollVfx.Play(true);
+        }
 
         Bounds b = throwArea.bounds;
 
@@ -58,6 +77,11 @@ public class DiceRoller : MonoBehaviour
                 UnityEngine.Random.Range(-torque, torque)
             );
             dice[i].rb.AddTorque(tq, ForceMode.Impulse);
+
+            // SFX: un sonido random por cada dado lanzado (no holdeado)
+            var audio = CasinoAudioSfx.Instance;
+            if (audio != null)
+                audio.PlayDiceThrow(UnityEngine.Random.Range(0f, 0.06f));
         }
 
         // 2) Wait minimum time

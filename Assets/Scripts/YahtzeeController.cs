@@ -132,6 +132,15 @@ public class YahtzeeController : MonoBehaviour
                 : $"Yahtzee: Perdiste. (Total {playerTotal} vs {npcTotal})");
         }
 
+        var audio = CasinoAudioSfx.Instance;
+
+        
+        if (audio != null)
+        {
+            if (win) audio.PlayWin();
+            else audio.PlayLose();
+        }
+
         gm.AddXP(bet);
 
         // stats (opcional)
@@ -143,7 +152,7 @@ public class YahtzeeController : MonoBehaviour
 
         ui.SetHoldsInteractable(false);
         ui.SetRollButtonInteractable(false);
-        ui.SetStatus("Partida terminada. Dale SALIR.");
+        ui.SetStatus("Partida terminada. Dale RENDIRSE (cagao).");
 
         // Espera a que el usuario le dé salir (si no lo hizo)
         exitRequested = false;
@@ -222,6 +231,14 @@ public class YahtzeeController : MonoBehaviour
 
                 int score = YahtzeeScoring.Score(chosenCat.Value, lastPlayerDice);
                 playerCard.Set(chosenCat.Value, score);
+
+                var audio = CasinoAudioSfx.Instance;
+                if (audio != null)
+                {
+                    if (score <= 0) audio.PlayScoreZero();
+                    else if (score >= YahtzeeScoring.MaxPossible(chosenCat.Value)) audio.PlayScoreMax();
+                }
+
                 ui.SetTotals(playerCard.Total(), npcCard.Total());
 
                 ui.SetStatus($"Guardaste {score} en {YahtzeeScoring.Pretty(chosenCat.Value)}.");
