@@ -87,7 +87,8 @@ public class CasinoStatsManager : MonoBehaviour
         if (won) data.totalPayoutCoins += Mathf.Max(0, payout);
 
         // Si quieres contar números:
-        RecordSymbol("roulette_" + landedNumber);
+        if (landedNumber >= 0)
+            RecordSymbol("roulette_" + landedNumber);
 
         if (won) data.totalWins++;
         else data.totalLosses++;

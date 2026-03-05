@@ -38,6 +38,7 @@ Wall by Quaternius (https://poly.pizza/m/CkF171SeTV)
 metal scaffold by Simon Hischier [CC-BY] (https://creativecommons.org/licenses/by/3.0/) via Poly Pizza (https://poly.pizza/m/fETtk2OoFZe)
 Cable Long by Quaternius (https://poly.pizza/m/WNfAG8VSD5)
 Cable by Quaternius (https://poly.pizza/m/aoNcGMnNiG)
+Prize Wheel by (https://sketchfab.com/3d-models/roullete-basic-ruleta-basica-726e0dce43c64bd0ab6c80c9a38c05ea)
 
 AUDIO
 Slots winning sound by https://www.youtube.com/watch?v=ZIcPW_uGPhU
@@ -45,7 +46,8 @@ Slots spinning sound by https://www.youtube.com/watch?v=hRDGI3kcjhg
 Music jingles by https://kenney.nl/assets/music-jingles
 Interface sounds by https://kenney.nl/assets/interface-sounds
 Casino audios (dice throws) by https://kenney.nl/assets/casino-audio
-Yahtzee winning jingle by https://freesound.org/people/LittleRobotSoundFactory/sounds/270545/
+Yahtzee winning jingle by josean_3dev https://freesound.org/people/LittleRobotSoundFactory/sounds/270545/
+Prize wheel sound in (https://www.voicy.network/es/search/8bit-game-sound-effects)
 
 MATERIALS
 Yughues Free Fabric Materials by Nobiax / Yughees
