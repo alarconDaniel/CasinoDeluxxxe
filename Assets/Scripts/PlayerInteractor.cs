@@ -5,14 +5,16 @@ public class PlayerInteractor : MonoBehaviour
     public float interactDistance = 3f;
     public HUDController hud;
 
-        [Header("Opcional: referencia al menú")]
+    [Header("Opcional: referencia al menú")]
     public CasinoStatsMenu statsMenu;
+
+    [Header("Opcional: referencia al menú de créditos")]
+    public CasinoCreditsMenu creditsMenu;
 
     void Update()
     {
-
-        // Si el menú está abierto, no interactuamos con nada.
-        if (statsMenu != null && statsMenu.IsOpen)
+        // Si algún menú está abierto, no interactuamos con nada.
+        if ((statsMenu != null && statsMenu.IsOpen) || (creditsMenu != null && creditsMenu.IsOpen))
         {
             hud.SetPrompt("");
             return;
