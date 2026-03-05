@@ -115,7 +115,18 @@ PBR Materials - Wood & Metal by Nobiax / Yughees
 
         // sfx opcional (si tienes CasinoAudioSfx)
         var audio = CasinoAudioSfx.Instance;
-        if (audio != null) audio.PlayPickCategory();
+        if (audio != null)
+        {
+            if (open)
+            {
+                audio.PlayPickCategory();   // click de abrir
+                audio.PlayCreditsMusic();   // cancioncita
+            }
+            else
+            {
+                audio.StopCreditsMusic();   // apaga al cerrar
+            }
+        }
     }
 
     IEnumerator Fade(bool open)

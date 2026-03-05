@@ -24,6 +24,12 @@ public class CasinoAudioSfx : MonoBehaviour
     [Range(0f, 1f)] public float diceVolume = 0.85f;
     [Range(0f, 1f)] public float jingleVolume = 1.0f;
 
+    [Header("Credits Music")]
+    public AudioClip creditsMusic;
+    [Range(0f, 1f)] public float creditsMusicVolume = 0.6f;
+
+    AudioSource musicSrc;
+
     AudioSource src;
 
     void Awake()
@@ -38,6 +44,11 @@ public class CasinoAudioSfx : MonoBehaviour
         src.playOnAwake = false;
         src.loop = false;
         src.spatialBlend = 0f; // 2D
+
+        musicSrc = gameObject.AddComponent<AudioSource>();
+        musicSrc.playOnAwake = false;
+        musicSrc.loop = true;
+        musicSrc.spatialBlend = 0f; // 2D
     }
 
     void PlayOneShot(AudioClip clip, float vol)
@@ -75,4 +86,23 @@ public class CasinoAudioSfx : MonoBehaviour
         yield return new WaitForSeconds(delay);
         PlayOneShot(clip, diceVolume);
     }
+
+    public void PlayCreditsMusic()
+{
+    if (creditsMusic == null || musicSrc == null) return;
+
+    if (musicSrc.isPlaying && musicSrc.clip == creditsMusic) return;
+
+    musicSrc.clip = creditsMusic;
+    musicSrc.volume = creditsMusicVolume;
+    musicSrc.loop = true;
+    musicSrc.Play();
+}
+
+public void StopCreditsMusic()
+{
+    if (musicSrc == null) return;
+    musicSrc.Stop();
+    musicSrc.clip = null;
+}
 }
