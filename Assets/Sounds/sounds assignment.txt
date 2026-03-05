@@ -1,9 +1,24 @@
 
+todos son ogg y estan ubicados en /sound
+
 click_001 - escoger una categoria
 maximize_006 - puntuar al maximo una categoria
 error_003 - puntuar en cero una categoria
-minimize_006 - puntuar en cero una categoria
-switch_001 - seleccionar un dado // o select_001 si es muy agobiante 
-
-
+minimize_006 - puntuar en cero una categoria (entonces o puede sonar uno o el otro al azar )
+switch_001 - seleccionar un dado (para holdear un dado ) 
 jingles_SAX07 perder
+
+y que para cada vez que se lance un dado suene uno de estos sonidos al azar (esos estan ubicados en sounds/dice)
+
+dice-throw-1
+dice-throw-2
+dice-throw-3
+die-throw-1
+die-throw-2
+die-throw-3
+die-throw-4
+
+y que para ganar suene este sonido:
+
+270545__littlerobotsoundfactory__jingle_win_01
+

@@ -35,6 +35,9 @@ Horse by Aya Kawa [CC-BY] (https://creativecommons.org/licenses/by/3.0/) via Pol
 ""Mage"" (https://skfb.ly/69VpA) by undeadfae is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
 Stool by Poly by Google [CC-BY] (https://creativecommons.org/licenses/by/3.0/) via Poly Pizza (https://poly.pizza/m/cLydFlVg-wI)
 Wall by Quaternius (https://poly.pizza/m/CkF171SeTV)
+metal scaffold by Simon Hischier [CC-BY] (https://creativecommons.org/licenses/by/3.0/) via Poly Pizza (https://poly.pizza/m/fETtk2OoFZe)
+Cable Long by Quaternius (https://poly.pizza/m/WNfAG8VSD5)
+Cable by Quaternius (https://poly.pizza/m/aoNcGMnNiG)
 
 AUDIO
 Slots winning sound by https://www.youtube.com/watch?v=ZIcPW_uGPhU
@@ -43,6 +46,13 @@ Music jingles by https://kenney.nl/assets/music-jingles
 Interface sounds by https://kenney.nl/assets/interface-sounds
 Casino audios (dice throws) by https://kenney.nl/assets/casino-audio
 Yahtzee winning jingle by https://freesound.org/people/LittleRobotSoundFactory/sounds/270545/
+
+MATERIALS
+Yughues Free Fabric Materials by Nobiax / Yughees
+Hand Painted Seamless Wood Texture Vol - 6 by Innovana Games
+PBR Materials - Wood & Metal by Adam Bielecki
+PBR Materials - Wood & Metal by Nobiax / Yughees
+
 ";
 
     public bool IsOpen => isOpen;
