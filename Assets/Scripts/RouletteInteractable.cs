@@ -43,7 +43,9 @@ public class RouletteInteractable : MonoBehaviour, IInteractable
     [Header("Giro")]
     public Vector3 localAxis = new Vector3(0, 1, 0);
     public float spinDuration = 3.0f;
-    public float startSpeed = 900f;
+    public float minStartSpeed = 700f;
+    public float maxStartSpeed = 1100f;
+
 
     [Header("Eje automático")]
     public bool autoDetectAxis = true;
@@ -74,6 +76,7 @@ public class RouletteInteractable : MonoBehaviour, IInteractable
     bool centerResolved;
     Vector3 spinCenterWorld;
     Vector3 spinAxisWorld;
+    float currentSpinSpeed;
 
     enum Kind { White, Red, Blue, Orange, Unknown }
 
@@ -135,6 +138,8 @@ public class RouletteInteractable : MonoBehaviour, IInteractable
 
         StartSpinAudio();
 
+        currentSpinSpeed = Random.Range(minStartSpeed, maxStartSpeed);
+
         StartCoroutine(SpinRoutine());
     }
 
@@ -148,8 +153,7 @@ public class RouletteInteractable : MonoBehaviour, IInteractable
             t += Time.deltaTime;
             float n = Mathf.Clamp01(t / spinDuration);
 
-            float speed = Mathf.Lerp(startSpeed, 0f, n * n);
-            float delta = speed * Time.deltaTime;
+            float speed = Mathf.Lerp(currentSpinSpeed, 0f, n * n); float delta = speed * Time.deltaTime;
             if (invertDirection) delta = -delta;
 
             wheelPivot.RotateAround(spinCenterWorld, spinAxisWorld, delta);
@@ -189,7 +193,7 @@ public class RouletteInteractable : MonoBehaviour, IInteractable
         string msg = BuildFriendlyResultMessage(k, coinsWin, xpWin, hitName);
         hud?.ShowResultTimed(SanitizeText(msg), resultMessageSeconds);
 
-                // ---- STATS (Ruleta) ----
+        // ---- STATS (Ruleta) ----
         var stats = CasinoStatsManager.Instance;
         if (stats != null)
         {
@@ -203,11 +207,11 @@ public class RouletteInteractable : MonoBehaviour, IInteractable
     {
         switch (k)
         {
-            case Kind.Blue:   return $"¡AZUL! HAS GANADO +{coinsWin} MONEDAS";
-            case Kind.Red:    return $"¡ROJO! HAS GANADO +{coinsWin} MONEDAS";
+            case Kind.Blue: return $"¡AZUL! HAS GANADO +{coinsWin} MONEDAS";
+            case Kind.Red: return $"¡ROJO! HAS GANADO +{coinsWin} MONEDAS";
             case Kind.Orange: return $"¡NARANJA! HAS GANADO +{xpWin} XP";
-            case Kind.White:  return "SIGUE INTENTANDO";
-            default:          return "SIGUE INTENTANDO";
+            case Kind.White: return "SIGUE INTENTANDO";
+            default: return "SIGUE INTENTANDO";
         }
     }
 
